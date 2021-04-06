@@ -23,10 +23,10 @@ Before we use this program we must create a file called `wirelessConfig.json` in
 ```json
  {
   "instruments": {
-    "(instrument 1)": [[(coords. 1)], [(coords. 2)], ...],
-    "(instrument 2)": [[(coords. 1)]]...
+    "(instrument 1)": [["(coords. 1)"], ["(coords. 2)"], ...],
+    "(instrument 2)": [["(coords. 1)"]]...
   },
-  "obstructions": [[(coords. 1)], [(coords. 2)], ...]
+  "obstructions": [["(coords. 1)"], ["(coords. 2)"], ...]
  }
 ```
  The list of valid instruments are as follows (note that it is case-sensitive) with it's instrument block:
@@ -70,10 +70,12 @@ In this scenario, `wirelessConfig.json` will look like this:
 
 You are allowed to configure the note block coordinates and the obstructing blocks however you want, but you need to keep some rules in mind:
 - At least 1 side of each note block's face must be kept clear so the note block can be activated; but that same face must not be used by another note block.
+
 ![Config Rule 1](images/NoteblockConfig1.PNG)
 
 - Leave a 2 block gap above and a 1 block gap below a noteblock, so the instrument block can be placed below it and an air gap above it. Above that, an instrument block could be placed if necessary.
- ![Config Rule 2](images/NoteblockConfig2.PNG)
+
+![Config Rule 2](images/NoteblockConfig2.png)
 
 ## Usage
 1. Go into the `WirelessNBS` directory.
