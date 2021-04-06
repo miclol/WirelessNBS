@@ -23,10 +23,10 @@ Before we use this program we must create a file called `wirelessConfig.json` in
 ```json
  {
   "instruments": {
-    "(instrument 1)": [["(coords. 1)"], ["(coords. 2)"], ...],
-    "(instrument 2)": [["(coords. 1)"]]...
+    "(instrument 1)": [["(coords. 1)"], ["(coords. 2)"]],
+    "(instrument 2)": [["(coords. 1)"]]
   },
-  "obstructions": [["(coords. 1)"], ["(coords. 2)"], ...]
+  "obstructions": [["(coords. 1)"], ["(coords. 2)"]]
  }
 ```
  The list of valid instruments are as follows (note that it is case-sensitive) with it's instrument block:
