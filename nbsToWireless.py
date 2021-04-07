@@ -12,7 +12,7 @@ from statistics import mean
 
 def returnNBS(song):
     invalid = False
-    notes = {}
+    notes = defaultdict(list)
     if song.header.tempo not in [2.5, 5.0, 10.0, 20.0]:
         invalid = True
     for tick in song:
@@ -21,10 +21,7 @@ def returnNBS(song):
             if key < 0 or key > 24 or note.instrument > 15:
                 invalid = True
             else:
-                if tick in notes:
-                    notes[tick].append([note.instrument, key])
-                else:
-                    notes[tick] = [[note.instrument, key]]
+                notes[tick] += [[note.instrument, key]]
                 instrument[2] += 1
         for instrument in instruments.values():
             if instrument[2] > instrument[1]:
@@ -122,16 +119,13 @@ def returnPlacement(instrumentCoords, obstructions):  # Thx for Lawrenc3X for he
 
     hazards.extend(p for p in neighbours if neighbours[p] >= 2)
 
-    redstoneCoords = {}
+    redstoneCoords = defaultdict(list)
     for coordsX, coordsY, coordsZ in noteblockCoords:
         coords = placement(coordsX, coordsY, coordsZ)
         if coords:
             for instrument in instruments.values():
                 if instrument[1] > 0:
-                    if instrument[0] in redstoneCoords:
-                        redstoneCoords[instrument[0]].append(coords)
-                    else:
-                        redstoneCoords[instrument[0]] = [coords]
+                    redstoneCoords[instrument[0]] += [coords]
                     instrument[1] -= 1
                     break
         else:
@@ -165,7 +159,6 @@ def main(song):
     power = ceil(log2(tickCount))
     rep = 2
     
-    print(noteblockCoords, '\n', redstoneCoords, '\n', obstructions)
     clear()
     mkdir(functionName)
     mkdir(f"{functionName}\\data")
