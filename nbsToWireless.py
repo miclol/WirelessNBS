@@ -63,7 +63,7 @@ def returnConfig():
         exit("Malformed JSON File.")
 
 def returnPlacement(instrumentCoords, obstructions):  # Thx for Lawrenc3X for helping me with this.
-    def badNoteblockPlacement(x, y, z):  # (https://github.com/Lawrenc3X)
+    def badNoteblockPlacement(x, y, z):               # (https://github.com/Lawrenc3X)
         yield x, y - 1, z
         yield x, y + 1, z
         yield x, y + 2, z
@@ -161,7 +161,6 @@ def main(song):
     rep = 2
 
     clear()
-    print(tempoMultiplier, tickCount)
     mkdir(functionName)
     mkdir(f"{functionName}\\data")
     mkdir(f"{functionName}\\data\\minecraft")

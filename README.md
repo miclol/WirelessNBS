@@ -1,4 +1,5 @@
 
+
 # WirelessNBS
 Turns a .nbs file into a Wireless Noteblock Piece via datapack.
 
@@ -60,7 +61,9 @@ Before we use this program we must create a file called `wirelessConfig.json` in
 You can also configure obstructing blocks, using `obstructions`, where you don't want the redstone placement to overwrite that certain block.
 
 Let's say that the note blocks you placed down are configured like this:
+
 ![Noteblock Placement](images/NoteblockPlacement.PNG)
+
 There are 2 "Piano"s, 1 "Click", 1 "Snare Drum", 1 "Bass Drum", and 2 Obstructing Blocks.
 In this scenario, `wirelessConfig.json` will look like this:
 ```json
