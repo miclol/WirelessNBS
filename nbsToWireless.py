@@ -279,5 +279,4 @@ if __name__ == "__main__":
     file = input("Input .nbs File: ")
     functionName = sub(r"[^a-zA-Z]", '', input("Enter Function Name: "))
     clear()
-    rmtree(functionName, True)
     main(file)
