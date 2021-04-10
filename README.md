@@ -21,6 +21,7 @@ To install this program, simply do this:
 ## NBS Validity
 When making a NBS file, make sure the notes are within the Minecraft limit and you're not using any custom instruments.
 Use the image below to validate whether the program can support the .nbs file.
+
 ![NBS Validator](images/NBSValid.png) 
 
 ## JSON Configuration
@@ -29,10 +30,10 @@ Before we use this program we must create a file called `wirelessConfig.json` in
 ```json
  {
   "instruments": {
-    "(instrument 1)": [["(coords. 1)"], ["(coords. 2)"], ...],
-    "(instrument 2)": [["(coords. 1)"]]...
+    "(instrument 1)": [["(coords. 1)"], ["(coords. 2)"]],
+    "(instrument 2)": [["(coords. 1)"]]
   },
-  "obstructions": [["(coords. 1)"], ["(coords. 2)"], ...]
+  "obstructions": [["(coords. 1)"], ["(coords. 2)"]]
  }
 ```
  The list of valid instruments are as follows (note that it is case-sensitive) with it's instrument block:
