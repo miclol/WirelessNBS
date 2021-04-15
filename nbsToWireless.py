@@ -36,7 +36,7 @@ def returnNBS(song):
 def returnConfig():
     try:
         neededCoords, instrumentCoords = 0, {}
-        config = load(open("wirelessConfig.json"))
+        config = load(open(f"{Path(file).stem}.json"))
         if "obstructions" in config:
             obstructions = [tuple(coords) for coords in config["obstructions"]]
         else:

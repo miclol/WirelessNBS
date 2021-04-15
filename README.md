@@ -24,7 +24,8 @@ Use the image below to validate whether the program can support the .nbs file.
 ![NBS Validator](images/NBSValid.png) 
 
 ## JSON Configuration
-Before we use this program we must create a file called `wirelessConfig.json` in the `WirelessNBS` directory.
+Before you use this program you must create a file with the same name as the `.nbs` file but instead of `.nbs`, the filetype needs be `.json`, and put it in the `WirelessNBS` directory. (If `.nbs` file is `Example.nbs` , then create  `Example.json`). 
+
  The formatting of the JSON file will be as follows:
 ```json
  {
@@ -63,7 +64,7 @@ Let's say that the note blocks you placed down are configured like this:
 ![Noteblock Placement](images/NoteblockPlacement.PNG)
 
 There are 2 "Piano"s, 1 "Click", 1 "Snare Drum", 1 "Bass Drum", and 2 Obstructing Blocks.
-In this scenario, `wirelessConfig.json` will look like this:
+In this scenario, `Example.json` will look like this:
 ```json
 {
   "instruments": {
@@ -88,7 +89,7 @@ You are allowed to configure the note block coordinates and the obstructing bloc
 ## Usage
 1. Go into the `WirelessNBS` directory.
 2. Copy the NBS file into the same directory as the program.
-3. Make sure you have `wirelessConfig.json` in the same directory as the program.
+3. Make sure you have your corresponding `.json` file in the same directory as the program.
 4. Open console and run the program by doing:
  ```
  $ python3 nbsToWireless.py
