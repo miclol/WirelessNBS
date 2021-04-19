@@ -137,9 +137,6 @@ def clear():
         system("clear")
 
 def main(song):
-    def snapToTick(value):
-        return round(value * 20) / 20
-
     if Path(song).suffix != ".nbs":
         exit("File isn't .nbs. Perhaps you spelt it wrong?")
     try:
@@ -156,59 +153,60 @@ def main(song):
     tagTName = tagName + "_t"
     tempoMultiplier = 20 / song.header.tempo
     noteC = 0
-    tickCount = snapToTick(song.header.song_length * tempoMultiplier)
+    tickCount = round(song.header.song_length * tempoMultiplier)
+    print(tempoMultiplier, song.header.song_length * tempoMultiplier, tickCount)
     power = ceil(log2(tickCount))
     rep = 2
 
     clear()
     mkdir(functionName)
-    mkdir(f"{functionName}\\data")
-    mkdir(f"{functionName}\\data\\minecraft")
-    mkdir(f"{functionName}\\data\\minecraft\\tags")
-    mkdir(f"{functionName}\\data\\minecraft\\tags\\functions")
-    mkdir(f"{functionName}\\data\\{functionName.lower()}")
-    mkdir(f"{functionName}\\data\\{functionName.lower()}\\functions")
-    mkdir(f"{functionName}\\data\\{functionName.lower()}\\functions\\ticks")
-    mkdir(f"{functionName}\\data\\{functionName.lower()}\\functions\\tree")
+    mkdir(f"{functionName}/data")
+    mkdir(f"{functionName}/data/minecraft")
+    mkdir(f"{functionName}/data/minecraft/tags")
+    mkdir(f"{functionName}/data/minecraft/tags/functions")
+    mkdir(f"{functionName}/data/{functionName.lower()}")
+    mkdir(f"{functionName}/data/{functionName.lower()}/functions")
+    mkdir(f"{functionName}/data/{functionName.lower()}/functions/ticks")
+    mkdir(f"{functionName}/data/{functionName.lower()}/functions/tree")
 
-    with open(f"{functionName}\\pack.mcmeta", 'w') as f:
+    with open(f"{functionName}/pack.mcmeta", 'w') as f:
         f.write("{\n\t\"pack\": {\n\t\t\"pack_format\": 1,\n\t\t\"description\": \"From NBS File To Wireless Noteblocks"
                 " Made by miclol.\"\n\t}\n}")
         f.close()
 
-    with open(f"{functionName}\\data\\minecraft\\tags\\functions\\tick.json", 'w') as f:
+    with open(f"{functionName}/data/minecraft/tags/functions/tick.json", 'w') as f:
         f.write("{\"values\": [\"%s:tick\"]}" % functionName.lower())
         f.close()
 
-    with open(f"{functionName}\\data\\minecraft\\tags\\functions\\load.json", 'w') as f:
+    with open(f"{functionName}/data/minecraft/tags/functions/load.json", 'w') as f:
         f.write("{\"values\": [\"%s:load\"]}" % functionName.lower())
         f.close()
 
-    with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\load.mcfunction", 'w') as f:
+    with open(f"{functionName}/data/{functionName.lower()}/functions/load.mcfunction", 'w') as f:
         f.write(f"scoreboard objectives add {tagName} dummy\nscoreboard objectives add {tagTName} dummy\ntellraw @a "
                 f"{{\"text\":\"{file} Ready!\",\"color\":\"green\"}}")
         f.close()
 
-    with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\tick.mcfunction", 'w') as f:
+    with open(f"{functionName}/data/{functionName.lower()}/functions/tick.mcfunction", 'w') as f:
         f.write(f"execute as @a[tag={tagName}] at @s run scoreboard players add @s {tagName} 1\nexecute as "
                 f"@a[tag={tagName}] at @s run function {functionName.lower()}:tree/0_{2 ** power - 1}")
         f.close()
 
-    with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\play.mcfunction", 'w') as f:
+    with open(f"{functionName}/data/{functionName.lower()}/functions/play.mcfunction", 'w') as f:
         f.write(f"execute as @a[distance=..32] run tag @s add {tagName}\nexecute as @a[distance=..32] run scoreboard "
                 f"players set @s {tagTName} -1")
         f.close()
 
-    with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\pause.mcfunction", 'w') as f:
+    with open(f"{functionName}/data/{functionName.lower()}/functions/pause.mcfunction", 'w') as f:
         f.write(f"execute as @a[tag={tagName}] run tag @s remove {tagName}")
         f.close()
 
-    with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\stop.mcfunction", 'w') as f:
+    with open(f"{functionName}/data/{functionName.lower()}/functions/stop.mcfunction", 'w') as f:
         f.write(f"execute as @a[tag={tagName}] run scoreboard players reset @s {tagName}\nexecute as @a[tag={tagName}] "
                 f"run scoreboard players reset @s {tagTName}\nexecute as @a[tag={tagName}] run tag @s remove {tagName}")
         f.close()
 
-    with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\uninstall.mcfunction", 'w') as f:
+    with open(f"{functionName}/data/{functionName.lower()}/functions/uninstall.mcfunction", 'w') as f:
         f.write(f"tag @a remove {tagName}\nscoreboard players remove @a {tagName}\nscoreboard players remove @a "
                 f"{tagTName}\ndatapack disable \"file/{functionName}.zip\"\ntellraw @a "
                 f"[\"\",{{\"text\":\"{functionName}\",\"underlined\":true,\"color\":\"gold\"}},{{\"text\":\" Noteblocks"
@@ -222,7 +220,7 @@ def main(song):
             avgNum = (num + upNum) / 2
             print(f"Building Tree: {num}-{upNum}")
             if p > 1:
-                with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\tree\\{num}_{upNum}.mcfunction",
+                with open(f"{functionName}/data/{functionName.lower()}/functions/tree/{num}_{upNum}.mcfunction",
                           'w') as f:
                     f.write(f"execute as @a[scores={{{tagName}={num}..{2 ** p + 1 + num}}}] run function "
                             f"{functionName.lower()}:tree/{num}_{floor(avgNum)}\nexecute as @a"
@@ -230,7 +228,7 @@ def main(song):
                             f"function {functionName.lower()}:tree/{ceil(avgNum)}_{upNum}")
                     f.close()
             else:
-                with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\tree\\{num}_{upNum}.mcfunction",
+                with open(f"{functionName}/data/{functionName.lower()}/functions/tree/{num}_{upNum}.mcfunction",
                           'w') as f:
                     f.write(f"execute as @a[scores={{{tagName}={num}..{2 ** p + 1 + num},{tagTName}=..{num - 1}}}] run "
                             f"function {functionName.lower()}:ticks/{num}")
@@ -245,7 +243,7 @@ def main(song):
 
     for tick in range(int(tickCount + 1)):
         print(f"Creating Tick: {tick}/{int(tickCount)}")
-        with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\ticks\\{tick}.mcfunction", 'w') as f:
+        with open(f"{functionName}/data/{functionName.lower()}/functions/ticks/{tick}.mcfunction", 'w') as f:
             f.write(f"scoreboard players set @s {tagTName} {tick}")
             if tick == tickCount:
                 f.write(f"\nfunction {functionName.lower()}:stop")
@@ -255,8 +253,8 @@ def main(song):
         noteC += 1
         print(f"Creating Note: {noteC}/{len(notes.keys())}")
         tempNoteblockCoords, tempRedstoneCoords = deepcopy(noteblockCoords), deepcopy(redstoneCoords)
-        with open(f"{functionName}\\data\\{functionName.lower()}\\functions\\ticks\\"
-                  f"{int(snapToTick(tick * tempoMultiplier))}.mcfunction", 'a') as f:
+        with open(f"{functionName}/data/{functionName.lower()}/functions/ticks/"
+                  f"{round(tick * tempoMultiplier)}.mcfunction", 'a') as f:
             for n in note:
                 noteblock, redstone = tempNoteblockCoords[n[0]][0], tempRedstoneCoords[n[0]][0]
                 f.write(f"\nsetblock {noteblock[0]} {noteblock[1]} {noteblock[2]} "
