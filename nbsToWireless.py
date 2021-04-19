@@ -154,7 +154,6 @@ def main(song):
     tempoMultiplier = 20 / song.header.tempo
     noteC = 0
     tickCount = round(song.header.song_length * tempoMultiplier)
-    print(tempoMultiplier, song.header.song_length * tempoMultiplier, tickCount)
     power = ceil(log2(tickCount))
     rep = 2
 
