@@ -1,8 +1,10 @@
+
+
 # WirelessNBS
 Turns a .nbs file into a Wireless Noteblock Piece via datapack.
 
 ## Prerequisites
-This program requires >= [Python](https://www.python.org/downloads/) 3.6, [pip](https://pip.pypa.io/en/stable/installing/), [PyNBS](https://github.com/vberlier/pynbs), [Open Note Block Studio](https://opennbs.org/), and [Minecraft](https://www.minecraft.net/).
+This program requires >= [Python](https://www.python.org/downloads/) 3.6, [pip](https://pip.pypa.io/en/stable/installing/), [Git](https://git-scm.com/downloads), [PyNBS](https://github.com/vberlier/pynbs), [Open Note Block Studio](https://opennbs.org/), and [Minecraft](https://www.minecraft.net/).
 
 PyNBS can be installed with `pip`:
  ```
