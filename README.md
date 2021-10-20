@@ -12,7 +12,7 @@ PyNBS can be installed with `pip`:
  NBS files can be made using Open Note Block Studio, and the datapack can be run using Minecraft.
  
 ## Installation
-To install this program, simply do this:
+To install or update this program, simply do this:
  ```
  $ git clone https://github.com/miclol/WirelessNBS
  ```
@@ -23,18 +23,15 @@ Use the image below to validate whether the program can support the .nbs file.
 
 ![NBS Validator](images/NBSValid.png) 
 
-## JSON Configuration
-Before you use this program you must create a file with the same name as the `.nbs` file but instead of `.nbs`, the filetype needs be `.json`, and put it in the `WirelessNBS` directory. (If `.nbs` file is `Example.nbs` , then create  `Example.json`). 
+## Config File Setup
+Before you use this program you must create a file with the same name as the `.nbs` file but instead of `.nbs`, the filetype needs be `.txt`, and put it in the `WirelessNBS` directory. (If `.nbs` file is `Example.nbs` , then create  `Example.txt`). 
 
- The formatting of the JSON file will be as follows:
-```json
- {
-  "instruments": {
-    "(instrument 1)": [["(coords. 1)"], ["(coords. 2)"]],
-    "(instrument 2)": [["(coords. 1)"]]
-  },
-  "obstructions": [["(coords. 1)"], ["(coords. 2)"]]
- }
+ The formatting of the TXT file is as follows:
+```
+<instrument 1> <X Coordinate> <Y Coordinate> <Z Coordinate>
+<instrument 2> <X Coordinate> <Y Coordinate> <Z Coordinate>
+...
+obstructions <X Coordinate> <Y Coordinate> <Z Coordinate>
 ```
  The list of valid instruments are as follows (note that it is case-sensitive) with it's instrument block:
 
@@ -64,17 +61,15 @@ Let's say that the note blocks you placed down are configured like this:
 ![Noteblock Placement](images/NoteblockPlacement.PNG)
 
 There are 2 "Piano"s, 1 "Click", 1 "Snare Drum", 1 "Bass Drum", and 2 Obstructing Blocks.
-In this scenario, `Example.json` will look like this:
-```json
-{
-  "instruments": {
-	"piano": [[0, 5, -2], [0, 5, -1]],
-	"click": [[0, 5, 0]],
-	"snare drum": [[0, 5, 1]],
-	"bass drum": [[0, 5, 2]]
-  },
-  "obstructions": [[0, 5, -3], [0, 5, 3]]
-}
+In this scenario, `Example.txt` will look like this:
+```
+piano 0 5 -2
+piano 0 5 -1
+click 0 5 0
+snare drum 0 5 1
+bass drum 0 5 2
+obstructions 0 5 -3
+obstructions 0 5 3
 ```
 
 You are allowed to configure the note block coordinates and the obstructing blocks however you want, but you need to keep some rules in mind:
@@ -89,10 +84,14 @@ You are allowed to configure the note block coordinates and the obstructing bloc
 ## Usage
 1. Go into the `WirelessNBS` directory.
 2. Copy the NBS file into the same directory as the program.
-3. Make sure you have your corresponding `.json` file in the same directory as the program.
+3. Make sure you have your corresponding `.txt` file in the same directory as the program.
 4. Open console and run the program by doing:
  ```
  $ python3 nbsToWireless.py
+ ```
+ OR: (Skip steps 5 and 6 if you use this method.)
+ ```
+ $ python3 nbsToWireless.py <NBS File> <Name Of Datapack>
  ```
 5. You'll be prompted to input the .nbs file that you're trying to convert. Input that and press 'Enter'.
 6. You'll be prompted to input the name of the datapack. Input that and press 'Enter'.

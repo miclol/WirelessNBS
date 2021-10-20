@@ -1,12 +1,15 @@
+from argparse import ArgumentParser
 from collections import defaultdict
 from copy import deepcopy
-from json import JSONDecodeError, load
 from math import ceil, floor, log2
 from os import mkdir, name, system
 from pathlib import Path
 from pynbs import read
-from re import sub
+from re import split, sub
 from shutil import make_archive, rmtree
+from sys import argv
+from traceback import print_exc
+
 
 def returnNBS(song):
     notes = defaultdict(list)
@@ -20,9 +23,9 @@ def returnNBS(song):
             elif note.instrument > 15:
                 exit(f"Invalid instrument on tick {tick}.")
             else:
-                notes[tick] += [[note.instrument, key]]
+                notes[tick] += [[note.instrument, key]]  # Assign Note w/ Instrument to Tick
                 instrument[2] += 1
-        for instrument in instruments.values():
+        for instrument in instruments.values():  # Calculates How Much Instruments At Once It Needs
             if instrument[2] > instrument[1]:
                 instrument[1] = instrument[2]
             instrument[2] = 0
@@ -33,37 +36,36 @@ def returnNBS(song):
             print(f"{instrument[0]} needed: {instrument[1]}")
     return notes
 
+
 def returnConfig():
     try:
         neededCoords, instrumentCoords = 0, {}
-        config = load(open(f"{Path(file).stem}.json"))
-        if "obstructions" in config:
-            obstructions = [tuple(coords) for coords in config["obstructions"]]
-        else:
-            obstructions = None
+        config = [split(r"(?<=\w) (?=-*\d)", sub(r'\n', '', c)) for c in open(f"{Path(file).stem}.txt").readlines()]
+        obstructions = [tuple(map(int, coords[1:])) for coords in config if coords[0] == "obstructions"]
         for instrument in instruments.values():
             instrumentName, instrumentCount = instrument
             instrumentJSON = instrumentName.lower()
-            neededCoords += instrumentCount
-            if instrumentJSON in config["instruments"]:
-                instrumentCoords[instrumentName] = [tuple(coords) for coords in config["instruments"][instrumentJSON]]
-                if len(instrumentCoords[instrumentName]) != instrumentCount:
+            if instrumentJSON in list(zip(*config))[0]:
+                neededCoords += instrumentCount
+                instrumentCoords[instrumentName] = [tuple(map(int, coords[1:])) for coords in config if
+                                                    coords[0] == instrumentJSON]
+                if len(instrumentCoords[instrumentName]) != instrumentCount:  # Checks if Number of Coords are Valid
                     exit(f"{instrumentName} needs {instrumentCount} coordinates, not "
                          f"{len(instrumentCoords[instrumentName])}.")
                 else:
                     neededCoords -= instrumentCount
-        if neededCoords != 0 or not all(len(i) == 3 for instrument in instrumentCoords.values() for i in instrument):
+        if neededCoords != 0 or not all(len(i) == 3 for instrument in instrumentCoords.values() for i in instrument):  # Checks Value Validity
             exit("Please view documentation to create a proper config file.")
         instrumentCoords = {k: value for key, value in instrumentCoords.items() for k, v in instruments.items()
                             if v[0] == key}
         return instrumentCoords, obstructions
     except FileNotFoundError:
         exit("Please view documentation on how to create a config file.")
-    except JSONDecodeError:
-        exit("Malformed JSON File.")
+    except:
+        exit("Malformed Config File.")
 
 def returnPlacement(instrumentCoords, obstructions):  # Thx for Lawrenc3X for helping me with this.
-    def badNoteblockPlacement(x, y, z):               # (https://github.com/Lawrenc3X)
+    def badNoteblockPlacement(x, y, z):  # (https://github.com/Lawrenc3X)
         yield x, y - 1, z
         yield x, y + 1, z
         yield x, y + 2, z
@@ -130,11 +132,13 @@ def returnPlacement(instrumentCoords, obstructions):  # Thx for Lawrenc3X for he
     redstoneCoords = {k: value for key, value in redstoneCoords.items() for k, v in instruments.items() if v[0] == key}
     return redstoneCoords
 
+
 def clear():
-    if name == "nt":
+    if name == "nt":  # Clears Terminal using Command Depending on which OS you're on
         system("cls")
     else:
         system("clear")
+
 
 def main(song):
     if Path(song).suffix != ".nbs":
@@ -143,8 +147,9 @@ def main(song):
         song = read(song)
     except FileNotFoundError:
         exit("File Does Not Exist. Perhaps you spelt it wrong?")
-    except:
-        exit("Invalid .nbs File.")
+    except Exception as e:
+        print_exc()
+        exit(f"Invalid .nbs File.\nError: {e}")
 
     notes = returnNBS(song)
     noteblockCoords, obstructions = returnConfig()
@@ -157,8 +162,7 @@ def main(song):
     power = ceil(log2(tickCount))
     rep = 2
 
-    clear()
-    mkdir(functionName)
+    mkdir(functionName)  # Makes Folder Directories and Stuff
     mkdir(f"{functionName}/data")
     mkdir(f"{functionName}/data/minecraft")
     mkdir(f"{functionName}/data/minecraft/tags")
@@ -168,7 +172,7 @@ def main(song):
     mkdir(f"{functionName}/data/{functionName.lower()}/functions/ticks")
     mkdir(f"{functionName}/data/{functionName.lower()}/functions/tree")
 
-    with open(f"{functionName}/pack.mcmeta", 'w') as f:
+    with open(f"{functionName}/pack.mcmeta", 'w') as f:  # Makes Files and Stuff
         f.write("{\n\t\"pack\": {\n\t\t\"pack_format\": 1,\n\t\t\"description\": \"From NBS File To Wireless Noteblocks"
                 " Made by miclol.\"\n\t}\n}")
         f.close()
@@ -212,7 +216,7 @@ def main(song):
                 f" Uninstalled. You may now remove it from your data pack folder.\",\"color\":\"yellow\"}}]")
         f.close()
 
-    for p in range(power, 0, -1):
+    for p in range(power, 0, -1):  # Creates Binary Search Tree
         num = 0
         for _ in range(rep):
             upNum = 2 ** p - 1 + num
@@ -240,7 +244,7 @@ def main(song):
                 break
         rep *= 2
 
-    for tick in range(int(tickCount + 1)):
+    for tick in range(int(tickCount + 1)):  # Creates a Basic Tick file first
         print(f"Creating Tick: {tick}/{int(tickCount)}")
         with open(f"{functionName}/data/{functionName.lower()}/functions/ticks/{tick}.mcfunction", 'w') as f:
             f.write(f"scoreboard players set @s {tagTName} {tick}")
@@ -248,7 +252,7 @@ def main(song):
                 f.write(f"\nfunction {functionName.lower()}:stop")
             f.close()
 
-    for tick, note in notes.items():
+    for tick, note in notes.items():  # Adds in Notes per tick
         noteC += 1
         print(f"Creating Note: {noteC}/{len(notes.keys())}")
         tempNoteblockCoords, tempRedstoneCoords = deepcopy(noteblockCoords), deepcopy(redstoneCoords)
@@ -263,7 +267,7 @@ def main(song):
             f.close()
 
     print("Making it Into a Zip File...")
-    make_archive(functionName, "zip", functionName)
+    make_archive(functionName, "zip", functionName)  # Makes it into a ZIP File
     rmtree(functionName, True)
     print("Done!")
 
@@ -273,7 +277,15 @@ if __name__ == "__main__":
                    4: ["Click", 0, 0], 5: ["Guitar", 0, 0], 6: ["Flute", 0, 0], 7: ["Bell", 0, 0], 8: ["Chime", 0, 0],
                    9: ["Xylophone", 0, 0], 10: ["Iron Xylophone", 0, 0], 11: ["Cow Bell", 0, 0],
                    12: ["Didgeridoo", 0, 0], 13: ["Bit", 0, 0], 14: ["Banjo", 0, 0], 15: ["Pling", 0, 0]}
-    file = input("Input .nbs File: ")
-    functionName = sub(r"[^a-zA-Z]", '', input("Enter Function Name: "))
+    parser = ArgumentParser(epilog="You can also not input any arguments to enter the details one by one.")
+    parser.add_argument('INPUT', type=str, help="The NBS File you're Turning Into a Datapack")
+    parser.add_argument('OUTPUT', type=str, help="The Name you Want the Datapack to Have")
+
+    if len(argv) <= 1:
+        file = input("Input .nbs File: ")
+        functionName = sub(r'\W', '', input("Enter Datapack Name: "))
+    else:
+        args = parser.parse_args()
+        file, functionName = args.INPUT, args.OUTPUT
     clear()
     main(file)
