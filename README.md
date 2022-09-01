@@ -16,7 +16,10 @@ To install or update this program, simply do this:
  ```
  $ git clone https://github.com/miclol/WirelessNBS
  ```
- 
+If you don't have `git`, just download the zipped source and unzip.
+
+![Download ZIP](images/Download.png)
+
 ## NBS Validity
 When making a NBS file, make sure the notes are within the Minecraft limit and you're not using any custom instruments.
 Use the image below to validate whether the program can support the .nbs file.
