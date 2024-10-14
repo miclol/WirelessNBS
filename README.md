@@ -98,4 +98,5 @@ You are allowed to configure the note block coordinates and the obstructing bloc
  ```
 5. You'll be prompted to input the .nbs file that you're trying to convert. Input that and press 'Enter'.
 6. You'll be prompted to input the name of the datapack. Input that and press 'Enter'.
-7. After it finishes, move the .zip folder to the datapack folder in the world you're using it in.
+7. Due to recent datapack changes in 1.21, you'll be prompted to respond to whether the function will be used in version 1.21 or above. Respond with "Y" if you will be running it in 1.21+. If not, respond with "N".
+8. After it finishes, move the .zip folder to the datapack folder in the world you're using it in.
