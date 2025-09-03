@@ -26,6 +26,8 @@ Use the image below to validate whether the program can support the .nbs file.
 
 ![NBS Validator](images/NBSValid.png) 
 
+NEW: WirelessNBS now supports Tempo Changer so even if it says "Resource pack only" it is okay in this case.
+
 ## Config File Setup
 Before you use this program you must create a file with the same name as the `.nbs` file but instead of `.nbs`, the filetype needs be `.txt`, and put it in the `WirelessNBS` directory. (If `.nbs` file is `Example.nbs` , then create  `Example.txt`). 
 
@@ -83,6 +85,8 @@ You are allowed to configure the note block coordinates and the obstructing bloc
 - Leave a 2 block gap above and a 1 block gap below a noteblock, so the instrument block can be placed below it and an air gap above it. Above that, an instrument block could be placed if necessary.
 
 ![Config Rule 2](images/NoteblockConfig2.png)
+
+NEW: Do NOT add in a configuration for Tempo Changer if it is used as it doesn't actually play any notes.
 
 ## Usage
 1. Go into the `WirelessNBS` directory.

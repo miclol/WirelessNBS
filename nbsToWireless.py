@@ -13,28 +13,41 @@ from traceback import print_exc
 
 def returnNBS(song):
     notes = defaultdict(list)
+    steps = []
+    lastTempo = song.header.tempo
+    tempo = lastTempo
+    lastTick = -1
     for tick in song:
         for note in tick[1]:
-            tick, key, instrument = note.tick, note.key - 33, instruments[note.instrument]
+            tick, key = note.tick, note.key - 33
             if key < 0:
                 exit(f"Note on tick {tick} too low for Minecraft.")
             elif key > 24:
                 exit(f"Note on tick {tick} too high for Minecraft.")
             elif note.instrument > 15:
-                exit(f"Invalid instrument on tick {tick}.")
+                if song.instruments[note.instrument - 16].name == "Tempo Changer":
+                    tempo = note.pitch / 15
+                else:
+                    exit(f"Invalid instrument on tick {tick}.")
             else:
+                instrument = instruments[note.instrument]
                 notes[tick] += [[note.instrument, key]]  # Assign Note w/ Instrument to Tick
                 instrument[2] += 1
+        if lastTempo != tempo:
+            steps.extend([lastTempo / 20] * (tick - lastTick))
+            lastTempo = tempo
+            lastTick = tick
         for instrument in instruments.values():  # Calculates How Much Instruments At Once It Needs
             if instrument[2] > instrument[1]:
                 instrument[1] = instrument[2]
             instrument[2] = 0
+    steps.extend([lastTempo / 20] * (tick - lastTick))
     print(f"Instruments needed for {file}:")
     for instrument in instruments.values():
         instrument.pop()
         if instrument[1] > 0:
             print(f"{instrument[0]} needed: {instrument[1]}")
-    return notes
+    return steps, notes
 
 
 def returnConfig():
@@ -151,16 +164,11 @@ def main(song):
         print_exc()
         exit(f"Invalid .nbs File.\nError: {e}")
 
-    notes = returnNBS(song)
+    steps, notes = returnNBS(song)
     noteblockCoords, obstructions = returnConfig()
     redstoneCoords = returnPlacement(noteblockCoords, obstructions)
     tagName = "note_" + functionName[:9].lower()
     tagTName = tagName + "_t"
-    tempoMultiplier = 20 / song.header.tempo
-    noteC = 0
-    tickCount = round(song.header.song_length * tempoMultiplier)
-    power = ceil(log2(tickCount))
-    rep = 2
 
     mkdir(functionName)  # Makes Folder Directories and Stuff
     mkdir(f"{functionName}/data")
@@ -171,6 +179,58 @@ def main(song):
     mkdir(f"{functionName}/data/{functionName.lower()}/{func}")
     mkdir(f"{functionName}/data/{functionName.lower()}/{func}/ticks")
     mkdir(f"{functionName}/data/{functionName.lower()}/{func}/tree")
+
+    noteIter, noteIndex = 1 - steps[0], 0
+    tickCount = 0
+    print("Creating Notes...")
+    while noteIndex < len(notes):  # Creates Notes
+        with open(f"{functionName}/data/{functionName.lower()}/{func}/ticks/{tickCount}.mcfunction", 'w') as f:
+            f.write(f"scoreboard players set @s {tagTName} {tickCount}")
+            noteIter += steps[noteIndex]
+            if (noteIter >= 1 - 1e-6):
+                tempNoteblockCoords, tempRedstoneCoords = deepcopy(noteblockCoords), deepcopy(redstoneCoords)
+                for n in notes[noteIndex]:
+                    noteblock, redstone = tempNoteblockCoords[n[0]][0], tempRedstoneCoords[n[0]][0]
+                    f.write(f"\nsetblock {noteblock[0]} {noteblock[1]} {noteblock[2]} "
+                            f"note_block[note={n[1]}]\nsetblock {redstone[0]} {redstone[1]} {redstone[2]} "
+                            f"redstone_block\nsetblock {redstone[0]} {redstone[1]} {redstone[2]} air")
+                    tempNoteblockCoords[n[0]].pop(0), tempRedstoneCoords[n[0]].pop(0)
+                noteIter -= 1
+                noteIndex += 1
+            if noteIndex == len(notes):
+                f.write(f"\nfunction {functionName.lower()}:stop")
+            f.close()
+        tickCount += 1
+
+    rep = 2
+    power = ceil(log2(tickCount))
+    print("Building Tree...")
+    for p in range(power, 0, -1):  # Creates Binary Search Tree
+        num = 0
+        for _ in range(rep):
+            upNum = 2 ** p - 1 + num
+            avgNum = (num + upNum) / 2
+            if p > 1:
+                with open(f"{functionName}/data/{functionName.lower()}/{func}/tree/{num}_{upNum}.mcfunction",
+                          'w') as f:
+                    f.write(f"execute as @a[scores={{{tagName}={num}..{2 ** p + 1 + num}}}] run function "
+                            f"{functionName.lower()}:tree/{num}_{floor(avgNum)}\nexecute as @a"
+                            f"[scores={{{tagName}={ceil(avgNum)}..{2 ** p + 1 + ceil(avgNum)}}}] run "
+                            f"function {functionName.lower()}:tree/{ceil(avgNum)}_{upNum}")
+                    f.close()
+            else:
+                with open(f"{functionName}/data/{functionName.lower()}/{func}/tree/{num}_{upNum}.mcfunction",
+                          'w') as f:
+                    f.write(f"execute as @a[scores={{{tagName}={num}..{2 ** p + 1 + num},{tagTName}=..{num - 1}}}] run "
+                            f"function {functionName.lower()}:ticks/{num}")
+                    if upNum <= tickCount:
+                        f.write(f"\nexecute as @a[scores={{{tagName}={ceil(avgNum)}..{2 ** p + 1 + ceil(avgNum)},"
+                                f"{tagTName}=..{upNum - 1}}}] run function {functionName.lower()}:ticks/{upNum}")
+                    f.close()
+            num += 2 ** p
+            if num > tickCount:
+                break
+        rep *= 2
 
     with open(f"{functionName}/pack.mcmeta", 'w') as f:  # Makes Files and Stuff
         f.write("{\n\t\"pack\": {\n\t\t\"pack_format\": 1,\n\t\t\"description\": \"From NBS File To Wireless Noteblocks"
@@ -215,56 +275,6 @@ def main(song):
                 f"[\"\",{{\"text\":\"{functionName}\",\"underlined\":true,\"color\":\"gold\"}},{{\"text\":\" Noteblocks"
                 f" Uninstalled. You may now remove it from your data pack folder.\",\"color\":\"yellow\"}}]")
         f.close()
-
-    for p in range(power, 0, -1):  # Creates Binary Search Tree
-        num = 0
-        for _ in range(rep):
-            upNum = 2 ** p - 1 + num
-            avgNum = (num + upNum) / 2
-            print(f"Building Tree: {num}-{upNum}")
-            if p > 1:
-                with open(f"{functionName}/data/{functionName.lower()}/{func}/tree/{num}_{upNum}.mcfunction",
-                          'w') as f:
-                    f.write(f"execute as @a[scores={{{tagName}={num}..{2 ** p + 1 + num}}}] run function "
-                            f"{functionName.lower()}:tree/{num}_{floor(avgNum)}\nexecute as @a"
-                            f"[scores={{{tagName}={ceil(avgNum)}..{2 ** p + 1 + ceil(avgNum)}}}] run "
-                            f"function {functionName.lower()}:tree/{ceil(avgNum)}_{upNum}")
-                    f.close()
-            else:
-                with open(f"{functionName}/data/{functionName.lower()}/{func}/tree/{num}_{upNum}.mcfunction",
-                          'w') as f:
-                    f.write(f"execute as @a[scores={{{tagName}={num}..{2 ** p + 1 + num},{tagTName}=..{num - 1}}}] run "
-                            f"function {functionName.lower()}:ticks/{num}")
-                    if upNum <= tickCount:
-                        f.write(f"\nexecute as @a[scores={{{tagName}={ceil(avgNum)}..{2 ** p + 1 + ceil(avgNum)},"
-                                f"{tagTName}=..{upNum - 1}}}] run function {functionName.lower()}:ticks/{upNum}")
-                    f.close()
-            num += 2 ** p
-            if num > tickCount:
-                break
-        rep *= 2
-
-    for tick in range(int(tickCount + 1)):  # Creates a Basic Tick file first
-        print(f"Creating Tick: {tick}/{int(tickCount)}")
-        with open(f"{functionName}/data/{functionName.lower()}/{func}/ticks/{tick}.mcfunction", 'w') as f:
-            f.write(f"scoreboard players set @s {tagTName} {tick}")
-            if tick == tickCount:
-                f.write(f"\nfunction {functionName.lower()}:stop")
-            f.close()
-
-    for tick, note in notes.items():  # Adds in Notes per tick
-        noteC += 1
-        print(f"Creating Note: {noteC}/{len(notes.keys())}")
-        tempNoteblockCoords, tempRedstoneCoords = deepcopy(noteblockCoords), deepcopy(redstoneCoords)
-        with open(f"{functionName}/data/{functionName.lower()}/{func}/ticks/"
-                  f"{round(tick * tempoMultiplier)}.mcfunction", 'a') as f:
-            for n in note:
-                noteblock, redstone = tempNoteblockCoords[n[0]][0], tempRedstoneCoords[n[0]][0]
-                f.write(f"\nsetblock {noteblock[0]} {noteblock[1]} {noteblock[2]} "
-                        f"note_block[note={n[1]}]\nsetblock {redstone[0]} {redstone[1]} {redstone[2]} "
-                        f"redstone_block\nsetblock {redstone[0]} {redstone[1]} {redstone[2]} air")
-                tempNoteblockCoords[n[0]].pop(0), tempRedstoneCoords[n[0]].pop(0)
-            f.close()
 
     print("Making it Into a Zip File...")
     make_archive(functionName, "zip", functionName)  # Makes it into a ZIP File
