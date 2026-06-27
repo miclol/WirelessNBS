@@ -286,7 +286,9 @@ if __name__ == "__main__":
     instruments = {0: ["Piano", 0, 0], 1: ["Double Bass", 0, 0], 2: ["Bass Drum", 0, 0], 3: ["Snare Drum", 0, 0],
                    4: ["Click", 0, 0], 5: ["Guitar", 0, 0], 6: ["Flute", 0, 0], 7: ["Bell", 0, 0], 8: ["Chime", 0, 0],
                    9: ["Xylophone", 0, 0], 10: ["Iron Xylophone", 0, 0], 11: ["Cow Bell", 0, 0],
-                   12: ["Didgeridoo", 0, 0], 13: ["Bit", 0, 0], 14: ["Banjo", 0, 0], 15: ["Pling", 0, 0]}
+                   12: ["Didgeridoo", 0, 0], 13: ["Bit", 0, 0], 14: ["Banjo", 0, 0], 15: ["Pling", 0, 0],
+                   16: ["Trumpet", 0, 0], 17: ["Exposed Trumpet", 0, 0], 18: ["Weathered Trumpet", 0, 0],
+                   19: ["Oxidized Trumpet", 0, 0]}
     parser = ArgumentParser(epilog="You can also not input any arguments to enter the details one by one.")
     parser.add_argument('INPUT', type=str, help="The NBS File you're Turning Into a Datapack")
     parser.add_argument('OUTPUT', type=str, help="The Name you Want the Datapack to Have")
